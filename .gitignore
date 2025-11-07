@@ -1,1 +1,59 @@
-.venv
+.venv/
+
+# Byte-compiled / cached files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
+
+# Environments
+venv/
+env/
+ENV/
+env.bak/
+
+# Installer logs
+pip-log.txt
+
+# Testing / typing
+.pytest_cache/
+.mypy_cache/
+
+# Editor directories and files
+.vscode/
+*.swp
+*~
+
+# Logs and databases
+*.log
+*.sqlite3
+*.db
+
+# Coverage
+.coverage
+htmlcov/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Secrets and config
+.env
+*.pem
+*.key
+
+# Frontend
+node_modules/
+
+# Temporary files
+*.tmp
+
+# Ignore compiled extensions
+*.so
+
