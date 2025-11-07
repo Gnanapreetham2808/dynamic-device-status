@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Device Status Monitor</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:,">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0b1020">
+</head>
+<body>
+  <div class="app">
+    <header class="app__header">
+      <h1>Device Status Monitor</h1>
+      <div class="header__right">
+        <div class="last-updated">
+          <span class="dot"></span>
+          <span id="lastUpdated">—</span>
+        </div>
+        <button id="refreshBtn" class="btn btn--primary">Refresh</button>
+      </div>
+    </header>
+
+    <section class="toolbar">
+      <div class="field">
+        <label for="companySelect">Company</label>
+        <select id="companySelect" class="select"></select>
+      </div>
+
+      <div class="field field--grow">
+        <label for="searchInput">Search devices</label>
+        <input id="searchInput" class="input" type="text" placeholder="Type to filter by name..." />
+      </div>
+
+      <div class="field">
+        <label>Status</label>
+        <div class="btn-group" role="group" aria-label="Filter status">
+          <button data-filter="all" class="btn btn--chip is-active">All</button>
+          <button data-filter="online" class="btn btn--chip">Online</button>
+          <button data-filter="offline" class="btn btn--chip">Offline</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="inline">
+          <input id="autoRefresh" type="checkbox" checked />
+          <span>Auto refresh (10s)</span>
+        </label>
+      </div>
+    </section>
+
+    <section class="legend">
+      <span class="pill pill--online">Online</span>
+      <span class="pill pill--offline">Offline</span>
+    </section>
+
+    <main id="devicesGrid" class="grid"></main>
+
+    <div id="emptyState" class="empty hidden">
+      <div>No devices to show</div>
+      <small>Try changing the company, filter, or search.</small>
+    </div>
+
+    <div id="loading" class="skeleton-list"></div>
+
+    <div id="toast" class="toast"></div>
+
+    <footer class="app__footer">
+      <small>Auto-refresh every 10s. Data from Flask API.</small>
+    </footer>
+  </div>
+
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
