@@ -1,5 +1,6 @@
 import os
 import psycopg2
+import argparse
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -15,15 +16,33 @@ def get_or_create_company(cur, name):
     return cur.fetchone()[0]
 
 def ensure_device(cur, company_id, name):
-    # Insert device only if it doesn't already exist for the company
+    # Insert device using ON CONFLICT on (company_id, name) so this is idempotent
+    cur.execute(
+        "INSERT INTO devices (company_id, name) VALUES (%s, %s) ON CONFLICT (company_id, name) DO NOTHING RETURNING id;",
+        (company_id, name),
+    )
+    res = cur.fetchone()
+    if res:
+        return res[0]
+    # if DO NOTHING happened, fetch the existing id
     cur.execute("SELECT id FROM devices WHERE company_id=%s AND name=%s;", (company_id, name))
-    if cur.fetchone() is None:
-        cur.execute("INSERT INTO devices (company_id,name) VALUES (%s,%s);", (company_id, name))
+    row = cur.fetchone()
+    return row[0] if row else None
 
 
 def main():
+    parser = argparse.ArgumentParser(description='Seed the device_status database')
+    parser.add_argument('--reset', action='store_true', help='Truncate tables before seeding')
+    args = parser.parse_args()
+
     conn = psycopg2.connect(DATABASE_URL)
     cur = conn.cursor()
+
+    if args.reset:
+        # truncate in dependency order
+        cur.execute("TRUNCATE device_readings, devices, companies RESTART IDENTITY CASCADE;")
+        conn.commit()
+        print("Database truncated (device_readings, devices, companies)")
 
     # create 2 companies and 3-5 devices each (idempotent)
     acme_id = get_or_create_company(cur, 'Acme Co')

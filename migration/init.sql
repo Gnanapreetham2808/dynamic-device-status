@@ -6,7 +6,9 @@ CREATE TABLE companies (
 CREATE TABLE devices (
   id SERIAL PRIMARY KEY,
   company_id INTEGER NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
-  name TEXT NOT NULL
+  name TEXT NOT NULL,
+  -- ensure device names are unique per company
+  UNIQUE (company_id, name)
 );
 
 CREATE TABLE device_readings (
