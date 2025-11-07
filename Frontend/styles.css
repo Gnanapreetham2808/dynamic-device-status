@@ -25,6 +25,7 @@ body{
 .app__header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 h1{margin:0;font-weight:700;letter-spacing:.2px}
 .header__right{display:flex;gap:12px;align-items:center}
+.summary{color:var(--muted);font-size:13px;padding:6px 10px;border:1px solid var(--border);border-radius:8px;background:rgba(255,255,255,.03)}
 .last-updated{display:flex;gap:8px;align-items:center;color:var(--muted);font-size:13px}
 .last-updated .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
 
@@ -54,6 +55,8 @@ h1{margin:0;font-weight:700;letter-spacing:.2px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:12px}
 .card{position:relative;display:flex;flex-direction:column;gap:10px;padding:14px 16px;background:linear-gradient(145deg,#111827 0%,#0d1524 60%);border:1px solid #1e293b;border-radius:14px;box-shadow:var(--shadow);min-height:120px;overflow:hidden}
 .card::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;background:linear-gradient(135deg,rgba(79,70,229,.6),rgba(16,185,129,.4));-webkit-mask:linear-gradient(#000,#000) content-box,linear-gradient(#000,#000);mask:linear-gradient(#000,#000) content-box,linear-gradient(#000,#000);-webkit-mask-composite:xor;mask-composite:exclude;opacity:.35}
+.card--online{border-color:rgba(16,185,129,.45)}
+.card--offline{border-color:rgba(239,68,68,.35)}
 .card__top{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .card__name{font-weight:600;font-size:15px;word-break:break-word}
 .badge{padding:4px 10px;border-radius:18px;font-size:11px;font-weight:600;letter-spacing:.4px;display:inline-flex;gap:6px;align-items:center}
@@ -61,6 +64,12 @@ h1{margin:0;font-weight:700;letter-spacing:.2px}
 .badge--offline{background:rgba(239,68,68,.18);color:var(--red);box-shadow:0 0 0 1px rgba(239,68,68,.3)}
 .card__meta{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:4px;margin-top:auto}
 .ago{font-weight:500;color:#cbd5e1}
+
+/* Sparkline placeholder */
+.sparkline{height:28px;display:flex;gap:4px;align-items:flex-end;margin-top:8px;opacity:.85}
+.sparkline__bar{width:4px;background:#1e293b;border-radius:2px 2px 0 0}
+.card--online .sparkline__bar{background:rgba(16,185,129,.35)}
+.card--offline .sparkline__bar{background:rgba(239,68,68,.28)}
 
 .empty{margin-top:40px;text-align:center;display:flex;flex-direction:column;gap:6px;color:var(--muted)}
 .hidden{display:none !important}

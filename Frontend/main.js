@@ -1,8 +1,9 @@
-const API_BASE = "http://localhost:5000/api";
+const API_BASE = `http://${window.location.hostname}:5000/api`;
 let currentCompanyId = null;
 let devicesCache = [];
 let pollHandle = null;
 let autoRefresh = true;
+let paused = false; // pause independent of autoRefresh checkbox
 let statusFilter = 'all'; // all | online | offline
 let searchTerm = '';
 
@@ -87,10 +88,21 @@ function renderDevices(devices){
 
   qs('#emptyState').classList.toggle('hidden', filtered.length !== 0);
 
+  // Summary counts
+  const onlineCount = devices.filter(d => d.status === 'online').length;
+  const totalCount = devices.length;
+  const summaryEl = qs('#summaryCounts');
+  if(summaryEl){
+    summaryEl.textContent = `${onlineCount} online / ${totalCount} total`;
+  }
+
   filtered.forEach(d => {
     const card = document.createElement('div');
-    card.className = 'card';
+    card.className = `card card--${d.status}`;
     const badgeCls = d.status === 'online' ? 'badge badge--online' : 'badge badge--offline';
+    // Build sparkline placeholder (random small bars for now)
+    const bars = Array.from({length:8},()=> Math.random());
+    const sparkHTML = `<div class="sparkline">${bars.map(v => `<div class="sparkline__bar" style="height:${8+Math.round(v*20)}px"></div>`).join('')}</div>`;
     card.innerHTML = `
       <div class="card__top">
         <div class="card__name">${d.device_name}</div>
@@ -100,6 +112,7 @@ function renderDevices(devices){
         <span class="ago">Last seen: ${fmtTime(d.last_read_at)}</span>
         <span>ID: ${d.device_id}</span>
       </div>
+      ${sparkHTML}
     `;
     grid.appendChild(card);
   });
@@ -137,8 +150,8 @@ async function refreshDevices(){
 
 function startPolling(){
   if (pollHandle) clearInterval(pollHandle);
-  if (!autoRefresh) return;
-  pollHandle = setInterval(refreshDevices, 10000);
+  if (!autoRefresh || paused) return;
+  pollHandle = setInterval(()=>{ if(!paused) refreshDevices(); }, 10000);
 }
 
 // Events
@@ -165,6 +178,16 @@ function wireEvents(){
 
   qs('#autoRefresh').addEventListener('change', (e)=>{
     autoRefresh = e.target.checked;
+    startPolling();
+  });
+
+  const pauseBtn = qs('#pauseBtn');
+  pauseBtn.addEventListener('click', ()=>{
+    paused = !paused;
+    pauseBtn.textContent = paused ? 'Resume' : 'Pause';
+    if(!paused){
+      refreshDevices();
+    }
     startPolling();
   });
 }

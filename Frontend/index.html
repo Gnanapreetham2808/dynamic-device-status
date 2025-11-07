@@ -17,11 +17,15 @@
     <header class="app__header">
       <h1>Device Status Monitor</h1>
       <div class="header__right">
+        <div id="summary" class="summary">
+          <span id="summaryCounts">0 online / 0 total</span>
+        </div>
         <div class="last-updated">
           <span class="dot"></span>
           <span id="lastUpdated">—</span>
         </div>
         <button id="refreshBtn" class="btn btn--primary">Refresh</button>
+        <button id="pauseBtn" class="btn" title="Pause background auto-refresh without changing the checkbox">Pause</button>
       </div>
     </header>
 
