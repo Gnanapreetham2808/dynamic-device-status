@@ -1,4 +1,9 @@
+# Python virtual environments
 .venv/
+venv/
+ENV/
+env/
+env.bak/
 
 # Byte-compiled / cached files
 __pycache__/
@@ -12,11 +17,7 @@ dist/
 *.egg
 .eggs/
 
-# Environments
-venv/
-env/
-ENV/
-env.bak/
+# (deduped above)
 
 # Installer logs
 pip-log.txt
