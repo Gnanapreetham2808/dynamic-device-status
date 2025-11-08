@@ -17,6 +17,6 @@ try:
         conn.commit()
         print(f"Inserted reading for device {did}")
         cur.close()
-        time.sleep(5)  # change frequency as needed
+        time.sleep(5)  
 except KeyboardInterrupt:
     conn.close()

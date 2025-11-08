@@ -7,7 +7,6 @@ load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 def get_or_create_company(cur, name):
-    # Try to insert; if already exists, fetch the id
     cur.execute("INSERT INTO companies (name) VALUES (%s) ON CONFLICT (name) DO NOTHING RETURNING id;", (name,))
     res = cur.fetchone()
     if res:
@@ -16,7 +15,7 @@ def get_or_create_company(cur, name):
     return cur.fetchone()[0]
 
 def ensure_device(cur, company_id, name):
-    # Insert device using ON CONFLICT on (company_id, name) so this is idempotent
+ 
     cur.execute(
         "INSERT INTO devices (company_id, name) VALUES (%s, %s) ON CONFLICT (company_id, name) DO NOTHING RETURNING id;",
         (company_id, name),
@@ -24,7 +23,7 @@ def ensure_device(cur, company_id, name):
     res = cur.fetchone()
     if res:
         return res[0]
-    # if DO NOTHING happened, fetch the existing id
+
     cur.execute("SELECT id FROM devices WHERE company_id=%s AND name=%s;", (company_id, name))
     row = cur.fetchone()
     return row[0] if row else None
@@ -39,12 +38,12 @@ def main():
     cur = conn.cursor()
 
     if args.reset:
-        # truncate in dependency order
+        
         cur.execute("TRUNCATE device_readings, devices, companies RESTART IDENTITY CASCADE;")
         conn.commit()
         print("Database truncated (device_readings, devices, companies)")
 
-    # create 2 companies and 3-5 devices each (idempotent)
+ 
     acme_id = get_or_create_company(cur, 'Acme Co')
     beta_id = get_or_create_company(cur, 'Beta Ltd')
 

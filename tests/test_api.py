@@ -19,7 +19,7 @@ def test_devices_status_for_first_company():
     assert r.status_code == 200
     devices = r.json()
     assert isinstance(devices, list)
-    # check expected fields
+    
     for d in devices:
         assert 'device_id' in d
         assert 'device_name' in d
