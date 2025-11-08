@@ -31,7 +31,7 @@ pip-log.txt
 *.swp
 *~
 
-# Logs and databases
+# Database files
 *.log
 *.sqlite3
 *.db
