@@ -30,3 +30,35 @@ def devices_by_company(company_id):
     conn.close()
     # rows are RealDict rows
     return jsonify([dict(r) for r in rows])
+
+@bp.route('/readings/device/<int:device_id>', methods=['GET'])
+def readings_by_device(device_id):
+    limit = request.args.get('limit', default=50, type=int)
+    conn = get_conn()
+    cur = conn.cursor()
+    query = """
+    SELECT 
+        id,
+        device_id,
+        temperature,
+        humidity,
+        vibration,
+        voltage,
+        current,
+        rpm,
+        power_watts,
+        noise_db,
+        latitude,
+        longitude,
+        inserted_at
+    FROM device_readings
+    WHERE device_id = %s
+    ORDER BY inserted_at DESC
+    LIMIT %s
+    """
+    cur.execute(query, (device_id, limit))
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+    # Return in chronological order (oldest to newest)
+    return jsonify([dict(r) for r in reversed(rows)])

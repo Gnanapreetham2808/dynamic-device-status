@@ -6,6 +6,27 @@ from dotenv import load_dotenv
 load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL")
 
+# Ensure UNIQUE(company_id, name) constraint
+def ensure_devices_unique_constraint(cur):
+    cur.execute(
+        """
+        SELECT 1
+        FROM pg_constraint c
+        JOIN pg_class t ON t.oid = c.conrelid
+        JOIN pg_namespace n ON n.oid = t.relnamespace
+        WHERE t.relname = 'devices'
+            AND n.nspname = 'public'
+            AND c.contype = 'u'
+            AND c.conname = 'devices_company_name_key';
+        """
+    )
+    exists = cur.fetchone()
+    if not exists:
+        cur.execute(
+            "ALTER TABLE devices ADD CONSTRAINT devices_company_name_key UNIQUE (company_id, name);"
+        )
+        print("🔧 Added UNIQUE constraint devices(company_id, name)")
+
 
 def get_or_create_company(cur, name):
     cur.execute(
@@ -15,6 +36,7 @@ def get_or_create_company(cur, name):
     res = cur.fetchone()
     if res:
         return res[0]
+
     cur.execute("SELECT id FROM companies WHERE name=%s;", (name,))
     return cur.fetchone()[0]
 
@@ -42,49 +64,55 @@ def ensure_device(cur, company_id, name):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Seed the device_status database")
-    parser.add_argument("--reset", action="store_true", help="Truncate tables before seeding")
+    parser = argparse.ArgumentParser(description="Seed the automotive device database")
+    parser.add_argument("--reset", action="store_true", help="Clear all tables first")
     args = parser.parse_args()
 
     conn = psycopg2.connect(DATABASE_URL)
     cur = conn.cursor()
 
+    # Reset tables if requested
     if args.reset:
         cur.execute("TRUNCATE device_readings, devices, companies RESTART IDENTITY CASCADE;")
         conn.commit()
-        print("🔄 Database truncated (device_readings, devices, companies)")
+        print("🔄 Database reset: companies, devices, device_readings")
 
-    # --- Companies ---
+    # Ensure required constraint
+    ensure_devices_unique_constraint(cur)
+
+    # --- Motor Companies ---
     company_names = [
-        "Acme Co",
-        "Beta Ltd",
-        "Gamma Networks",
-        "Delta Systems",
-        "Epsilon Tech"
+        "Maruti Suzuki",
+        "Honda",
+        "Hyundai",
+        "Tata Motors",
+        "Mahindra",
+        "Toyota",
+        "BMW",
+        "Hero MotoCorp",
     ]
 
     company_ids = {}
     for name in company_names:
         company_ids[name] = get_or_create_company(cur, name)
 
-    # --- Devices ---
-    company_devices = {
-        "Acme Co": ["Acme-R1", "Acme-R2", "Acme-Switch", "Acme-AP"],
-        "Beta Ltd": ["Beta-R1", "Beta-R2", "Beta-Switch", "Beta-AP", "Beta-Core"],
-        "Gamma Networks": ["Gamma-R1", "Gamma-R2", "Gamma-Edge"],
-        "Delta Systems": ["Delta-R1", "Delta-R2", "Delta-Switch", "Delta-Edge"],
-        "Epsilon Tech": ["Epsilon-R1", "Epsilon-R2", "Epsilon-Core", "Epsilon-AP"],
-    }
+    # --- Automotive sensor devices ---
+    sensor_list = [
+        "Engine-Temp",
+        "Battery-Voltage",
+        "Speed-RPM",
+        "Fuel-Level",
+        "GPS-Location",
+    ]
 
-    for company, devices in company_devices.items():
-        cid = company_ids[company]
-        for dev in devices:
-            ensure_device(cur, cid, dev)
+    for company, cid in company_ids.items():
+        for sensor in sensor_list:
+            ensure_device(cur, cid, sensor)
 
     conn.commit()
     cur.close()
     conn.close()
-    print("✅ Seeded 5 companies and their devices (idempotent)")
+    print("✅ Seeded automotive companies and sensors successfully (idempotent)")
 
 
 if __name__ == "__main__":

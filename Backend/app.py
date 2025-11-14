@@ -23,6 +23,7 @@ def create_app():
         endpoints = {
             "companies": url_for('companies.list_companies', _external=False),
             "devices_by_company": "/api/devices/company/<company_id>",
+            "readings_by_device": "/api/devices/readings/device/<device_id>?limit=50",
             "health": url_for('health', _external=False)
         }
         return jsonify({"endpoints": endpoints})
